@@ -1,19 +1,18 @@
 package com.example.SpringWebAPI.service;
 
+import com.example.SpringWebAPI.exception.UsernameNotFoundException;
 import com.example.SpringWebAPI.model.User;
 import com.example.SpringWebAPI.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserSignUpService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepo;
 
-    public UserSignUpService(UserRepository userRepo){
+    public CustomUserDetailsService(UserRepository userRepo){
         this.userRepo=userRepo;
     }
 
@@ -24,12 +23,5 @@ public class UserSignUpService implements UserDetailsService {
 
         return user;
     }
-
-    public void saveUser(User user){
-        userRepo.save(user);
-    }
-
-    public boolean isUsernameExists(String username){
-        return userRepo.existsByUsername(username);
-    }
 }
+
