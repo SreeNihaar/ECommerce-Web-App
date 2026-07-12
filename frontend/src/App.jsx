@@ -3,16 +3,22 @@ import './App.css'
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
+import Login from './components/Login';
+import SignUp from './components/SignUp';
 
 function App() {
 
   return (
     <div className="App">
-      <Navbar />
+      {/* <Navbar />
       <Home />
-      <Footer />
-    </div> 
+      <Footer /> */}
+      <Login />
+      {/* <SignUp /> */}
+    </div>
   )
 }
 
-export default App
+export default App;
+
+

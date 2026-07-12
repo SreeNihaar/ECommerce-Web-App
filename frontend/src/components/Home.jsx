@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Product from "./Product";
 import GetAllProducts from "../api/product/GetAllProducts";
+import Login from "./Login";
 
 function Home(){
     const [productResponseList, setProductResponseList] = useState([]);
@@ -19,15 +20,21 @@ function Home(){
     }, []);
 
     return(
-        <div className="Home pt-7 px-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 w-full h-[85vh] overflow-y-auto">
+        // <div className="Home pt-7 px-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 w-full h-[85vh] overflow-y-auto">
+        <div className="">
+           
+            <Login />
 
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
         </div>
     );
 }
 
+        //     {/* <Product />
+        //     <Product />
+        //     <Product />
+        //     <Product />
+        //     <Product /> */}
+        // {/* </div> */}
+
 export default Home;
+
