@@ -1,5 +1,5 @@
-import AuthenticationService from "./authentication/AuthenticationService";
-import axios from "./customAxiosConfig/CustomAxiosConfig";
+import AuthenticationService from "./AuthenticationService";
+import axios from "../customAxiosConfig/CustomAxiosConfig";
 
 const config = import.meta.env;
 
@@ -16,7 +16,7 @@ const Signup = async (userData) => {
             console.log("Signup successful");
         }
         return response;
-    }
+    } 
     catch(error){
         console.error("Signup failed:", error);
         return error;
@@ -24,4 +24,3 @@ const Signup = async (userData) => {
 }
 
 export default Signup;
-
