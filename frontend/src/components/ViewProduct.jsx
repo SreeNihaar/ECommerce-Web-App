@@ -1,7 +1,7 @@
 import React from 'react';
 import samsungTv from "../assets/samsung_tv.jpg";
 
-function Product(){
+function ViewProduct(){
     return(
         <div className="product cursor-pointer shadow-xl bg-gray-100 border border-black w-full h-fit p-4" onClick={()=>console.log("Clicked!!")} >
             <div className="imageDiv mt-1 flex justify-center">
@@ -24,4 +24,4 @@ function Product(){
     );
 }
 
-export default Product;
+export default ViewProduct;

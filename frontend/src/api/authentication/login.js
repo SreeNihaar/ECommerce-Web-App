@@ -1,5 +1,5 @@
-import axios from "./customAxiosConfig/CustomAxiosConfig";
-import AuthenticationService from "./authentication/AuthenticationService";
+import axios from "../customAxiosConfig/CustomAxiosConfig";
+import AuthenticationService from "./AuthenticationService";
 
 const config = import.meta.env;
 
@@ -22,4 +22,3 @@ const Login = async (credentials) => {
 }
 
 export default Login;
-

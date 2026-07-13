@@ -1,24 +1,15 @@
 import React from 'react';
 import './App.css'
-import Footer from './components/Footer';
-import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Login from './components/Login';
-import SignUp from './components/SignUp';
+import { RouterProvider } from 'react-router-dom';
+import router from './components/route/router.jsx';
 
 function App() {
 
   return (
     <div className="App">
-      {/* <Navbar />
-      <Home />
-      <Footer /> */}
-      <Login />
-      {/* <SignUp /> */}
-    </div>
+      <RouterProvider router={router}></RouterProvider>
+    </div> 
   )
 }
 
 export default App;
-
-

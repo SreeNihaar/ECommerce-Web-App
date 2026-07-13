@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import Product from "./Product";
+import ViewProduct from "./ViewProduct";
 import GetAllProducts from "../api/product/GetAllProducts";
-import Login from "./Login";
 
-function Home(){
+function ProductDashboard(){
     const [productResponseList, setProductResponseList] = useState([]);
 
     useEffect(() => {
@@ -20,21 +19,14 @@ function Home(){
     }, []);
 
     return(
-        // <div className="Home pt-7 px-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 w-full h-[85vh] overflow-y-auto">
-        <div className="">
-           
-            <Login />
-
+        <div className="ProductDashboard pt-7 px-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 w-full h-[85vh] overflow-y-auto">
+            <ViewProduct />
+            <ViewProduct />
+            <ViewProduct />
+            <ViewProduct />
+            <ViewProduct />
         </div>
     );
 }
 
-        //     {/* <Product />
-        //     <Product />
-        //     <Product />
-        //     <Product />
-        //     <Product /> */}
-        // {/* </div> */}
-
-export default Home;
-
+export default ProductDashboard;
