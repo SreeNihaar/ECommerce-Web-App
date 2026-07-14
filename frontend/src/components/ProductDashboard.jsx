@@ -9,8 +9,8 @@ function ProductDashboard(){
         GetAllProducts().then(
             (res) => {
                 if(res.data != null)
-                    setProductResponseList(res.data);
-                console.log(res.data);
+                    setProductResponseList(res.body);
+                console.log(res.body);
             }
         )
         .catch((err) => {

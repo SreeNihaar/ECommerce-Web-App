@@ -4,6 +4,7 @@ import ProductDashboard from "../ProductDashboard.jsx";
 import Login from "../Login.jsx";
 import Signup from "../SignUp.jsx";
 import Layout from "../Layout.jsx";
+import Product from "../Product.jsx";
 
 const router = createBrowserRouter([
     {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
     {
         path: "/signup",
         element: <Signup />
+    },
+    {
+        path: "/products/:productId",
+        element: <Product />
     }
 ]);
 

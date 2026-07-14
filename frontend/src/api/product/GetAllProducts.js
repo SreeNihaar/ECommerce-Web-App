@@ -4,7 +4,8 @@ const config = import.meta.env;
 
 const GetAllProducts = async () =>{
     try{
-        return await axios.get(`${config.VITE_BACKEND_URL}/products`);
+        const response = await axios.get(`${config.VITE_BACKEND_URL}/products`);
+        return response.data;
     }
     catch(err){
         let error = "";
