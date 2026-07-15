@@ -1,8 +1,10 @@
 import React,{useState} from "react";
 import Signup from "../api/authentication/signup.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () =>{
+
+    const navigate = useNavigate();
     const [userData, setUserData] = useState({
         username: "",
         password: "",
@@ -40,14 +42,15 @@ const SignUp = () =>{
         e.preventDefault();
         if(passwordConfirmation() && checkEmptyFields()){
             const response = await Signup(userData);
-            if(response.status === 409){
+            if(response.status === 409 ){
                 setError("Username already exists. Please choose a different username.");
             }
-            else if(response.status !== 201){
-                setError("Signup failed. Please try again.");
-            } 
-            else{
+            else if(response.status === 201){
                 setError(null);
+                navigate("/",{replace: true});
+            }
+            else{
+                setError("Signup failed. Please try again later.");
             }
         }
     }
@@ -55,7 +58,7 @@ const SignUp = () =>{
     return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-blue-900 to-indigo-900">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8">
-            {error && 
+            {error &&
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-5">
                     {error}
                 </div>
@@ -77,7 +80,7 @@ const SignUp = () =>{
                     className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     onChange={(e) => setUserData({...userData, password: e.target.value})} />
                 </div>
-                
+               
                 <div >
                     <label htmlFor="confirmPassword" className="font-medium text-slate-700">Confirm Password:</label>
                     <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password"
@@ -91,7 +94,7 @@ const SignUp = () =>{
                     className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     onChange={(e) => setUserData({...userData, firstname: e.target.value})} />
                 </div>
-                
+               
                 <div >
                     <label htmlFor="lastname" className="font-medium text-slate-700">Last Name:</label>
                     <input type="text" name="lastname" id="lastname" placeholder="Last Name"
@@ -108,7 +111,7 @@ const SignUp = () =>{
 
             </div>
             <div className="signup_btn mt-8">
-                <button 
+                <button
                     type="button"
                     onClick={handleSignUp}
                         className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 active:scale-95 transition-all duration-200 cursor-pointer"
@@ -116,7 +119,7 @@ const SignUp = () =>{
                     Sign Up
                 </button>
             </div>
-            
+           
             <div className="text">
                 <h2 className="text-center text-slate-600">
                     Already have an account?{" "}
