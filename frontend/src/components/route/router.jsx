@@ -1,10 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import ProductDashboard from "../ProductDashboard.jsx";
-import Login from "../Login.jsx";
-import Signup from "../SignUp.jsx";
 import Layout from "../Layout.jsx";
-import Product from "../Product.jsx";
+import ProductLayout from "../ProductLayout.jsx";
+import Loading from "../Loading.jsx";
+import { lazy } from "react";
+
+const Product = lazy(()=>import("../Product.jsx"));
+const SignUp = lazy(()=> import("../SignUp.jsx"));
+const Login = lazy(()=> import("../Login.jsx"));
 
 const router = createBrowserRouter([
     {
@@ -14,14 +18,26 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <ProductDashboard />
-            },
+            }
+        ]
+    },
+    {
+        path: "/products",
+        element: <Layout />,
+        children: [
             {
-                path: "hi",
-                element: <h1>Hi</h1>
-            },
+                index: true,
+                element: <ProductDashboard />
+            }
+        ]
+    },
+    {
+        path: "/products/:productId",
+        element: <ProductLayout />,
+        children: [
             {
-                path: "bye",
-                element: <h1>Bye</h1>
+                index: true,
+                element: <Product />
             }
         ]
     },
@@ -31,11 +47,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/signup",
-        element: <Signup />
-    },
-    {
-        path: "/products/:productId",
-        element: <Product />
+        element: <SignUp />
     }
 ]);
 

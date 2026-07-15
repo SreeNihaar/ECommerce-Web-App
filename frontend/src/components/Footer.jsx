@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 function Footer(){
-    const [currentPage, setCurrentPage] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPage = parseInt(searchParams.get("page") || "1", 10);
     const totalPages = 48;
 
     const getPageNumbers = () => {
@@ -25,9 +26,9 @@ function Footer(){
     };
 
     return(
-        <div className="Footer flex justify-center items-center gap-2 py-6">
+        <div className="Footer flex justify-center items-center gap-2 py-2 border-t bg-white">
             <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                onClick={() => setSearchParams({ page: Math.max(1, currentPage - 1) })}
                 disabled={currentPage === 1}
                 className={`${
                         currentPage === 1 ? "" : "cursor-pointer"
@@ -40,7 +41,7 @@ function Footer(){
             {getPageNumbers().map((page, idx) => (
                 <button
                     key={idx}
-                    onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                    onClick={() => typeof page === 'number' && setSearchParams({ page })}
                     disabled={page === "..."}
                     className={`px-3 py-2 border ${
                         page === currentPage
@@ -53,7 +54,7 @@ function Footer(){
             ))}
 
             <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() => setSearchParams({ page: Math.min(totalPages, currentPage + 1) })}
                 disabled={currentPage === totalPages}
                 className={`${
                         currentPage === totalPages ? "" : "cursor-pointer"

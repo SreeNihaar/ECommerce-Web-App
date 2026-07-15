@@ -11,6 +11,7 @@ import com.example.SpringWebAPI.service.ProductService;
 
 import com.example.SpringWebAPI.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,8 +35,9 @@ public class ProductController {
 
     // GET All Products
     @GetMapping({"","/"})
-    public ResponseEntity<SuccessResponse<List<ProductResponseDTO>>> getAllProducts(){
-        List<ProductResponseDTO> result = productService.findAll();
+    public ResponseEntity<SuccessResponse<Page<ProductResponseDTO>>> getAllProducts(@RequestParam(defaultValue = "1") int page,
+                                                                                    @RequestParam(defaultValue = "8") int size){
+        Page<ProductResponseDTO> result = productService.findAll(page-1,size);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new SuccessResponse<>(
                         "Success",
