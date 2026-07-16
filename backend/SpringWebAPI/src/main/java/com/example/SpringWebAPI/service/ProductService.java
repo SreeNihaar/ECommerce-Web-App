@@ -1,6 +1,7 @@
 package com.example.SpringWebAPI.service;
 
 import com.example.SpringWebAPI.dto.request.ProductRequestDTO;
+import com.example.SpringWebAPI.dto.response.PageResponseDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseByIdDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseDTO;
 import com.example.SpringWebAPI.exception.ProductNotFoundException;
@@ -57,27 +58,36 @@ public class ProductService {
         return result;
     }
 
-    public Page<ProductResponseDTO> findAll(int page,int size){
+    public PageResponseDTO<ProductResponseDTO> findAll(int page, int size){
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Product> result =  repo.findAll(pageable);
-        Page<ProductResponseDTO> response = repo.findAll(pageable)
-                .map(prod -> {
-                    ProductResponseDTO dto = new ProductResponseDTO();
+        Page<Product> products = repo.findAll(pageable);
 
-                    dto.setId(prod.getProductId());
-                    dto.setProductName(prod.getProductName());
-                    dto.setPrice(prod.getPrice());
-                    dto.setImageName(prod.getImageName());
-                    dto.setImageData(prod.getImageData());
-                    dto.setImageType(prod.getImageType());
-                    dto.setRating(prod.getRating());
-                    dto.setQuantity(prod.getStock());
-                    dto.setCategory(prod.getCategory());
+        List<ProductResponseDTO> content = new ArrayList<>();
+        for(Product prod: products){
+            ProductResponseDTO dto = new ProductResponseDTO();
 
-                    return dto;
-                });
-        return response;
+            dto.setId(prod.getProductId());
+            dto.setProductName(prod.getProductName());
+            dto.setPrice(prod.getPrice());
+            dto.setImageName(prod.getImageName());
+            dto.setImageData(prod.getImageData());
+            dto.setImageType(prod.getImageType());
+            dto.setRating(prod.getRating());
+            dto.setQuantity(prod.getStock());
+            dto.setCategory(prod.getCategory());
+            content.add(dto);
+        }
+
+        PageResponseDTO<ProductResponseDTO> result = new PageResponseDTO<>();
+        result.setContent(content);
+        result.setLast(products.isLast());
+        result.setPage(products.getNumber());
+        result.setSize(products.getSize());
+        result.setTotalPages(products.getTotalPages());
+        result.setTotalElements(products.getTotalElements());
+
+        return result;
     }
 
     public int addProduct(String userName,Product prod, MultipartFile image) throws IOException {

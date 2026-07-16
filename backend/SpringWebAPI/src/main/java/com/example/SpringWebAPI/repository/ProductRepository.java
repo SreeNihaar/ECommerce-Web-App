@@ -1,6 +1,5 @@
 package com.example.SpringWebAPI.repository;
 
-import com.example.SpringWebAPI.dto.request.ProductRequestDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseDTO;
 import com.example.SpringWebAPI.model.Product;
 import org.springframework.data.domain.Page;

@@ -11,8 +11,8 @@ const Product = () =>{
     function isNumber(str) {
         return typeof str === "string" && /^[1-9]\d*$/.test(str);
     }
-   
-   
+    
+    
     useEffect(()=>{
         if(!isNumber(productId)){
             console.error("Error fetching product. Product Id is not Valid Number");
@@ -29,7 +29,7 @@ const Product = () =>{
             });
     },[]);
 
-   
+    
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -67,7 +67,7 @@ const Product = () =>{
                         Sold by <span className="font-semibold">{product.merchantName}</span>
                     </p>
                     <hr className="my-6" />
-                   
+                    
                     <div>
                         <h3 className="text-xl font-semibold mb-3">
                             Description

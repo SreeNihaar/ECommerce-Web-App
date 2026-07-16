@@ -12,7 +12,7 @@ function ProductDashboard(){
     const [searchParams, setSearchParams] = useSearchParams();
 
     const page = searchParams.get("page") || 1;
-   
+    
     useEffect(() => {
         GetAllProducts().then(
             (res) => {

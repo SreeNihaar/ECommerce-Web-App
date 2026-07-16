@@ -9,10 +9,15 @@ const Signup = async (userData) => {
             `${config.VITE_BACKEND_URL}/auth/signup`,
              userData
         );
+        
         if(response.status === 201){
-            console.log(response.data);
             const responseBody = response.data.body;
-            AuthenticationService.setupToken(responseBody.accessToken);
+            
+            AuthenticationService.setToken(responseBody.accessToken);
+            AuthenticationService.setExpiration(responseBody.expiration);
+            AuthenticationService.setUsername(responseBody.username);
+            AuthenticationService.setUserRoles(responseBody.roles);
+
             console.log("Signup successful");
         }
         return response;

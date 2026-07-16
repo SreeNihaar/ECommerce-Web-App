@@ -9,4 +9,3 @@ public class LoginRequestDTO {
     String username;
     String password;
 }
-
