@@ -2,6 +2,7 @@ package com.example.SpringWebAPI.controller;
 
 import com.example.SpringWebAPI.dto.request.ProductRequestDTO;
 import com.example.SpringWebAPI.dto.request.ProductToCartDTO;
+import com.example.SpringWebAPI.dto.response.PageResponseDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseByIdDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseDTO;
 import com.example.SpringWebAPI.exception.ProductNotFoundException;
@@ -35,9 +36,9 @@ public class ProductController {
 
     // GET All Products
     @GetMapping({"","/"})
-    public ResponseEntity<SuccessResponse<Page<ProductResponseDTO>>> getAllProducts(@RequestParam(defaultValue = "1") int page,
-                                                                                    @RequestParam(defaultValue = "8") int size){
-        Page<ProductResponseDTO> result = productService.findAll(page-1,size);
+    public ResponseEntity<SuccessResponse<PageResponseDTO<ProductResponseDTO>>> getAllProducts(@RequestParam(defaultValue = "1") int page,
+                                                                                               @RequestParam(defaultValue = "8") int size){
+        PageResponseDTO<ProductResponseDTO> result = productService.findAll(page-1,size);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new SuccessResponse<>(
                         "Success",

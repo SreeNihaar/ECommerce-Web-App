@@ -3,7 +3,7 @@ import axios from "../customAxiosConfig/CustomAxiosConfig";
 const config = import.meta.env;
 
 class ProductService{
-       
+        
     getProductById = async (id) =>{
         let error = "";
         if(typeof id !== 'number'){

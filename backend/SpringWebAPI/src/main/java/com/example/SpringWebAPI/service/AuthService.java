@@ -64,25 +64,30 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        return new JWTResponseDTO(jwtToken,jwtService.extractExpiration(jwtToken),savedUser.getUsername());
+        JWTResponseDTO result = new JWTResponseDTO();
+        result.setAccessToken(jwtToken);
+        result.setExpiration(jwtService.extractExpiration(jwtToken));
+        result.setUsername(savedUser.getUsername());
+        result.appendRole(role.toString());
+
+        return result;
     }
 
     public JWTResponseDTO verify(LoginRequestDTO request){
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
 
-        if(authentication.isAuthenticated()){
-            String token = jwtService.generateToken(request.getUsername());
-            JWTResponseDTO responseDTO = new JWTResponseDTO();
-            responseDTO.setAccessToken(token);
-            responseDTO.setUsername(jwtService.extractUsername(token));
-            responseDTO.setExpiration(jwtService.extractExpiration(token));
-            return responseDTO;
-        }
-        throw new UsernameNotFoundException("Username or Password Incorrect");
+            if(authentication.isAuthenticated()){
+                String token = jwtService.generateToken(request.getUsername());
+                JWTResponseDTO responseDTO = new JWTResponseDTO();
+                responseDTO.setAccessToken(token);
+                responseDTO.setUsername(jwtService.extractUsername(token));
+                responseDTO.setExpiration(jwtService.extractExpiration(token));
+                return responseDTO;
+            }
+            throw new UsernameNotFoundException("Username or Password Incorrect");
     }
 
     public boolean isUsernameExists(String username){
         return userRepo.existsByUsername(username);
     }
 }
-

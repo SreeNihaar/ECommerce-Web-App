@@ -10,9 +10,14 @@ const Login = async (credentials) => {
              credentials
         );
         if(response.status === 200){
-            console.log("Login successful");
             const responseBody = response.data.body;
-            AuthenticationService.setupToken(responseBody.accessToken);
+
+            AuthenticationService.setToken(responseBody.accessToken);
+            AuthenticationService.setExpiration(responseBody.expiration);
+            AuthenticationService.setUsername(responseBody.username);
+            AuthenticationService.setUserRoles(responseBody.roles);
+            
+            console.log("Login successful");
         }
         return response;
     }
