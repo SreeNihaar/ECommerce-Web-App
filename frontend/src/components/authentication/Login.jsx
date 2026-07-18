@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import LoginAPI from "../api/authentication/login.js";
+import LoginAPI from "../../api/authentication/login.js";
 import { Link, replace, useNavigate } from "react-router-dom";
 
 const Login = () =>{

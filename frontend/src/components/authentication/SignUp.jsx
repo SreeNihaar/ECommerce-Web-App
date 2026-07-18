@@ -1,5 +1,5 @@
-import React,{useState} from "react";
-import Signup from "../api/authentication/signup.js";
+import {useState} from "react";
+import Signup from "../../api/authentication/signup.js";
 import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () =>{

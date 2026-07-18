@@ -5,6 +5,7 @@ import com.example.SpringWebAPI.dto.request.ProductToCartDTO;
 import com.example.SpringWebAPI.dto.request.UpdateStatusRequestDTO;
 import com.example.SpringWebAPI.dto.response.MerchantRequestResponseDTO;
 import com.example.SpringWebAPI.dto.response.MyCartResponseDTO;
+import com.example.SpringWebAPI.dto.response.ProfileResponseDTO;
 import com.example.SpringWebAPI.exception.MerchantRequestNotFoundException;
 import com.example.SpringWebAPI.exception.ProductNotFoundException;
 import com.example.SpringWebAPI.exception.UserNotFoundException;
@@ -12,7 +13,7 @@ import com.example.SpringWebAPI.model.*;
 import com.example.SpringWebAPI.model.enums.RequestStatus;
 import com.example.SpringWebAPI.model.enums.UserRole;
 import com.example.SpringWebAPI.repository.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.example.SpringWebAPI.exception.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,20 @@ public class UserService {
     public int addUser(User user){
         User savedUser = userRepo.save(user);
         return savedUser.getUserId();
+    }
+
+    public ProfileResponseDTO getMyProfile(String username){
+        User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        ProfileResponseDTO responseDTO = new ProfileResponseDTO();
+
+        responseDTO.setUsername(user.getUsername());
+        responseDTO.setFirstname(user.getFirstName());
+        responseDTO.setLastname(user.getLastName());
+        responseDTO.setPhonenumber(user.getPhoneNumber());
+        responseDTO.setAddress(user.getAddress());
+        responseDTO.setRoles(user.getRoles().stream().map(role -> role.getRoleName().toString()).toList());
+
+        return responseDTO;
     }
 
     public User getUserById(int id){

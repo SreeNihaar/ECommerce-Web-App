@@ -1,15 +1,47 @@
-import React, { useEffect, useState } from "react";
-import productService from "../api/product/ProductService";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import productService from "../../api/product/ProductService.js";
+import { useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { useData} from "../../context/CheckoutContext.jsx";
+import AuthenticationService from "../../api/authentication/AuthenticationService.js";
 
 const Product = () =>{
     const [product , setProduct] = useState({});
+    const {checkoutMap,updateCheckoutItem} = useData();
+    const navigate = useNavigate();
+
     const productId = useParams().productId;
 
     function isNumber(str) {
         return typeof str === "string" && /^[1-9]\d*$/.test(str);
+    }
+
+    const count = (checkoutMap[product.id]) ? checkoutMap[product.id].count : 0;
+
+
+    function addCount(e) {
+        e.stopPropagation();
+        if(!AuthenticationService.isUserLoggedIn()){
+            navigate("/login");
+            return;
+        }
+        if (count < 9) {
+            const newValue = count + 1;
+            updateCheckoutItem(product, newValue);
+        }
+    }
+
+    function subCount(e) {
+        e.stopPropagation();
+        if(!AuthenticationService.isUserLoggedIn()){
+            navigate("/login");
+            return;
+        }
+        if (count > 0) {
+            const newValue = count - 1;
+            updateCheckoutItem(product, newValue);
+        }
     }
     
     
@@ -18,10 +50,8 @@ const Product = () =>{
             console.error("Error fetching product. Product Id is not Valid Number");
             return;
         }
-        console.log(Number(productId))
         productService.getProductById(Number(productId))
             .then((res)=>{
-                console.log(res.body);
                 setProduct(res.body);
             })
             .catch((err)=>{
@@ -51,7 +81,7 @@ const Product = () =>{
                         {product.productName}
                     </h1>
                     <p className="mt-2 text-yellow-500 text-lg">
-                         {[...Array(5)].map((_, i) => (
+                        {[...Array(5)].map((_, i) => (
                                 <FontAwesomeIcon
                                     key={i}
                                     icon={faStar}
@@ -81,9 +111,29 @@ const Product = () =>{
                         <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition cursor-pointer">
                             Add to Cart
                         </button>
-                        <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition cursor-pointer">
-                            Buy Now
-                        </button>
+                        {
+                            (count === 0)?
+                            (
+                                <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition cursor-pointer" onClick={addCount}>
+                                    Buy Now
+                                </button>
+                            ):
+                            (
+                                <div className="flex items-center justify-center gap-3 px-4 border border-green-600 rounded-lg">
+                                    <button className="w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 active:scale-95 transition cursor-pointer" onClick={subCount}>
+                                        -
+                                    </button>
+
+                                    <span className="text-lg font-semibold w-6 text-center">
+                                        {count}
+                                    </span>
+
+                                    <button className="w-9 h-9 rounded-lg bg-red-500 text-white hover:bg-red-600 active:scale-95 transition cursor-pointer" onClick={addCount}>
+                                        +
+                                    </button>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>

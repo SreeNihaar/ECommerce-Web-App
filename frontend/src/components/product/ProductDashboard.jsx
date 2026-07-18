@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import GetAllProducts from "../api/product/GetAllProducts";
 import { lazy, Suspense } from "react";
-import Loading from "./Loading";
+import Loading from "../Loading.jsx";
 import { useSearchParams } from "react-router-dom";
+import { usePagination } from "../../context/PaginationContext.jsx";
+import ProductService from "../../api/product/ProductService.js";
 
-const ViewProduct = lazy(()=>import("./ViewProduct"));
+const ViewProduct = lazy(()=>import("./ViewProduct.jsx"));
 
 function ProductDashboard(){
     const [productResponseList, setProductResponseList] = useState([]);
@@ -13,13 +14,16 @@ function ProductDashboard(){
 
     const page = searchParams.get("page") || 1;
     
+    const {setTotalPages} = usePagination();
+
     useEffect(() => {
-        GetAllProducts().then(
+        ProductService.getAllProducts(page).then(
             (res) => {
-                if(res != null)
+                if(res != null){
+                    console.log(res)
                     setProductResponseList(res.body.content);
-                console.log(res.body)
-                console.log(page)
+                    setTotalPages(res.body.totalPages);
+                }
             }
         )
         .catch((err) => {
@@ -30,11 +34,9 @@ function ProductDashboard(){
     return(
         <Suspense fallback={<Loading />}>
             <div className="ProductDashboard pt-7 px-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 w-full">
-                <ViewProduct />
-                <ViewProduct />
-                <ViewProduct />
-                <ViewProduct />
-                <ViewProduct />
+                {productResponseList.map(product =>{
+                    return <ViewProduct key={product.id} product={product}/>
+                })}
             </div>
         </Suspense >
     );

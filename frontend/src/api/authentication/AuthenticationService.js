@@ -37,7 +37,7 @@ class AuthenticationService {
 
     getUserRoles(){
         const roles = localStorage.getItem('roles');
-        if(roles.trim()===null){
+        if(roles === null || roles.trim() === null){
             return [];
         }
         const rolesArray = JSON.parse(roles);
