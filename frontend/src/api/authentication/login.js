@@ -12,6 +12,8 @@ const Login = async (credentials) => {
         if(response.status === 200){
             const responseBody = response.data.body;
 
+            console.log(responseBody);
+
             AuthenticationService.setToken(responseBody.accessToken);
             AuthenticationService.setExpiration(responseBody.expiration);
             AuthenticationService.setUsername(responseBody.username);

@@ -12,7 +12,6 @@ class ProductService{
         }
         try{
             const response = await axios.get(`${config.VITE_BACKEND_URL}/products/${id}`)
-            console.log(response.data);
             return response.data;
         }
         catch(err){
@@ -21,9 +20,16 @@ class ProductService{
         }
     }
 
-    getAllProducts = async () =>{
+    getAllProducts = async (page) =>{
+        if(page === null){
+            page=1;
+        }
+        if(typeof page !== 'number'){
+            error = "Not a valid Page";
+            return error;
+        }
         try{
-            const response = await axios.get(`${config.VITE_BACKEND_URL}/products`);
+            const response = await axios.get(`${config.VITE_BACKEND_URL}/products?page=${page}`);
             return response.data;
         }
         catch(err){

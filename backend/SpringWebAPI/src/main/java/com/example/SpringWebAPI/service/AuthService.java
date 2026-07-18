@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AuthService {
 
@@ -77,11 +79,17 @@ public class AuthService {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
 
             if(authentication.isAuthenticated()){
+                User userDetails = (User) authentication.getPrincipal();
                 String token = jwtService.generateToken(request.getUsername());
                 JWTResponseDTO responseDTO = new JWTResponseDTO();
                 responseDTO.setAccessToken(token);
                 responseDTO.setUsername(jwtService.extractUsername(token));
+                if(userDetails != null){
+                    List<String> roles = userDetails.getRoles().stream().map(role -> role.getRoleName().toString()).toList();
+                    responseDTO.setRoles(roles);
+                }
                 responseDTO.setExpiration(jwtService.extractExpiration(token));
+
                 return responseDTO;
             }
             throw new UsernameNotFoundException("Username or Password Incorrect");

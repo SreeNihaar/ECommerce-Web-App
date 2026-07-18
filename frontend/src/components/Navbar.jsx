@@ -10,7 +10,49 @@ function Navbar(){
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(AuthenticationService.isUserLoggedIn());
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
+    
+    const userRoles = AuthenticationService.getUserRoles();
+
+    const getMenuOptions = () => {
+
+        const consumerMenu = [
+            { label: "My Orders", path: "/orders" },
+            { label: "My Profile", path: "/myprofile" },
+            { label: "My Requests", path: "/requests" },
+        ];
+
+        const merchantMenu = [
+            { label: "Merchant Profile", path: "/merchant/profile" },
+            { label: "My Products", path: "/merchant/products" },
+            { label: "Merchant Orders", path: "/merchant/orders" },
+            { label: "Add Product", path: "/merchant/products/new" },
+        ];
+
+        const adminMenu = [
+            { label: "Analytics", path: "/admin/analytics" },
+            { label: "Users", path: "/admin/users" },
+            { label: "Merchants", path: "/admin/merchants" },
+            { label: "Requests", path: "/admin/requests" },
+        ];
+
+        let result = [];
+
+        for(let idx in userRoles){
+            console.log("ROLE::: ",idx, userRoles[idx]);
+            if(userRoles[idx] === 'CONSUMER'){
+                result.push(...consumerMenu);
+            }
+            if(userRoles[idx] === 'MERCHANT'){
+                result.push(...merchantMenu);
+            }
+            if(userRoles[idx] === 'ADMIN'){
+                result.push(...adminMenu);
+            }
+        }
+        return result;
+    };
     return (
         <div className="Navbar bg-white shadow-md px-6 h-16 flex items-center justify-between sticky top-0 z-50">
             <div className="app-name font-bold text-2xl text-blue-600 tracking-wide cursor-pointer">
@@ -37,13 +79,41 @@ function Navbar(){
                         <FontAwesomeIcon icon={faSearch} />
                     </div>
                 )}
-                {(isLoggedIn) ? (
+                {(AuthenticationService.isUserLoggedIn()) ? (
                     <>
-                        <div className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition">
+                        <Link to="/cart" className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition">
                             <FontAwesomeIcon icon={faCartShopping} />
-                        </div>
-                        <div className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition" >
-                            <FontAwesomeIcon icon={faUserAstronaut} />
+                        </Link>
+                        <div className="relative">
+                            <div
+                                className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition"
+                                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                            >
+                                <FontAwesomeIcon icon={faUserAstronaut} />
+                            </div>
+                            {userMenuOpen && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                    {getMenuOptions().map((option) => (
+                                        <Link
+                                            key={option.path}
+                                            to={option.path}
+                                            onClick={() => setUserMenuOpen(false)}
+                                            className="block px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition border-b last:border-b-0 first:rounded-t-lg last:rounded-b-lg"
+                                        >
+                                            {option.label}
+                                        </Link>
+                                    ))}
+                                    <button
+                                        onClick={() => {
+                                            AuthenticationService.logout();
+                                            setUserMenuOpen(false);
+                                        }}
+                                        className="w-full px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition border-t text-left rounded-b-lg cursor-pointer"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </>
                 ):(
@@ -102,17 +172,53 @@ function Navbar(){
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                     <div className="border-t border-gray-300"></div>
-                    {(isLoggedIn)?(
+                    {(AuthenticationService.isUserLoggedIn())?(
                         <>
-                            <div className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition border-b">
-                                <FontAwesomeIcon icon={faUserAstronaut} className="text-2xl" />
-                                <span className="text-lg">Profile</span>
-                            </div>
-
-                            <div className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition border-b">
+                            <Link
+                                to="/cart"
+                                onClick={() => setMenuOpen(false)}
+                                className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition border-b"
+                            >
                                 <FontAwesomeIcon icon={faCartShopping} className="text-2xl" />
                                 <span className="text-lg">My Cart</span>
+                            </Link>
+
+                            <div className="border-b">
+                                <div
+                                    onClick={() => setMobileUserMenuOpen(!mobileUserMenuOpen)}
+                                    className="px-5 py-4 flex items-center gap-4 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition"
+                                >
+                                    <FontAwesomeIcon icon={faUserAstronaut} className="text-2xl" />
+                                    <span className="text-lg">Account</span>
+                                </div>
+                                {mobileUserMenuOpen && (
+                                    <div className="bg-gray-50 border-t">
+                                        {getMenuOptions().map((option) => (
+                                            <Link
+                                                key={option.path}
+                                                to={option.path}
+                                                onClick={() => {
+                                                    setMenuOpen(false);
+                                                    setMobileUserMenuOpen(false);
+                                                }}
+                                                className="block px-8 py-3 text-gray-700 hover:bg-blue-100 hover:text-blue-600 transition border-b last:border-b-0"
+                                            >
+                                                {option.label}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            <button
+                                onClick={() => {
+                                    AuthenticationService.logout();
+                                    setMenuOpen(false);
+                                }}
+                                className="w-full px-5 py-4 text-gray-700 hover:bg-red-50 hover:text-red-600 transition border-b text-left font-medium cursor-pointer"
+                            >
+                                Logout
+                            </button>
                         </>
                     ):(
                         <Link

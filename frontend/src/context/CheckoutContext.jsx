@@ -5,25 +5,30 @@ const CheckoutContext = createContext(null);
 const CheckoutProvider = ({children}) =>{
     const [checkoutMap,setCheckoutMap] = useState({});
 
-    function updateCheckoutItem(item,count){
+    function updateCheckoutItem(product,count){
         setCheckoutMap((prev)=>{
-            if(!prev){
-                return {[item.id]:{item,count}};
+            const updated = {...prev};
+            if(count<=0){
+                delete updated[product.id];
+            } else {
+                updated[product.id] = {
+                    count
+                };
             }
-            const newObject={...prev};
-            if(count===0){
-                delete newObject[item.id];
-                return newObject;
-            }
-            return {
-                ...prev,
-                [item.id]:{item,count}
-            }
+
+            console.log(updated);
+
+            return updated;
         });
     }
 
+    function clearCheckout(){
+        console.log("Clearing the Checkout Items");
+        setCheckoutMap({});
+    }
+
     return (
-        <CheckoutContext.Provider value={{checkoutMap, updateCheckoutItem}}>
+        <CheckoutContext.Provider value={{checkoutMap, updateCheckoutItem, clearCheckout}}>
             {children}
         </CheckoutContext.Provider>
     );

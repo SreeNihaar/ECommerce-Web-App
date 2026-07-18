@@ -2,6 +2,7 @@ package com.example.SpringWebAPI.controller;
 
 import com.example.SpringWebAPI.dto.request.MerchantRequestDTO;
 import com.example.SpringWebAPI.dto.response.MyCartResponseDTO;
+import com.example.SpringWebAPI.dto.response.ProfileResponseDTO;
 import com.example.SpringWebAPI.model.Cart;
 import com.example.SpringWebAPI.model.CartProduct;
 import com.example.SpringWebAPI.model.User;
@@ -10,8 +11,11 @@ import com.example.SpringWebAPI.response.SuccessResponse;
 import com.example.SpringWebAPI.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +36,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                 "Fetched the User Successfully",
                 user
+        ));
+    }
+
+    @GetMapping({"/myprofile"})
+    public ResponseEntity<SuccessResponse<ProfileResponseDTO>> getMyProfile(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null){
+            throw new RuntimeException("Un-Authorized");
+        }
+        String userName = authentication.getName();
+        ProfileResponseDTO responseDTO = service.getMyProfile(userName);
+        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
+                "Fetched My Profile Successfully.",
+                responseDTO
         ));
     }
 

@@ -2,14 +2,17 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useData } from "../context/CheckoutContext";
+import { usePagination } from "../context/PaginationContext";
 
 function Footer() {
     const navigate = useNavigate();
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const currentPage = parseInt(searchParams.get("page") || "1", 10);
-    const totalPages = 48;
-    const { checkoutMap, updateCheckoutItem } = useData();
+    const {totalPages} = usePagination();
+    // const totalPages = 48;
+
+    const { checkoutMap, updateCheckoutItem, clearCheckout } = useData();
     
     //TODO: Need to get the keys of cartMap Replace this with your actual cart count
     const countItems = Object.keys(checkoutMap).length;
@@ -41,6 +44,13 @@ function Footer() {
         return pages;
     };
 
+    const changePage = (page) =>{
+        navigate({
+            pathname: "/products",
+            search: `?page=${page}`
+        });
+    };
+
     return (
         <>
             <footer className="relative flex justify-center items-center py-4 border-t bg-white">
@@ -48,11 +58,7 @@ function Footer() {
                 {/* Pagination */}
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() =>
-                            setSearchParams({
-                                page: Math.max(1, currentPage - 1),
-                            })
-                        }
+                        onClick={() => changePage(Math.max(1,currentPage -1))}
                         disabled={currentPage === 1}
                         className={`${
                             currentPage === 1 ? "" : "cursor-pointer"
@@ -66,7 +72,7 @@ function Footer() {
                             key={idx}
                             onClick={() =>
                                 typeof page === "number" &&
-                                setSearchParams({ page })
+                                changePage(page)
                             }
                             disabled={page === "..."}
                             className={`px-3 py-2 border rounded-md ${
@@ -84,11 +90,7 @@ function Footer() {
                     ))}
 
                     <button
-                        onClick={() =>
-                            setSearchParams({
-                                page: Math.min(totalPages, currentPage + 1),
-                            })
-                        }
+                        onClick={() => changePage(Math.min(totalPages,currentPage+1))}
                         disabled={currentPage === totalPages}
                         className={`${
                             currentPage === totalPages ? "" : "cursor-pointer"
@@ -101,7 +103,8 @@ function Footer() {
                 {/* Desktop Checkout */}
                 {countItems > 0 &&
                     <button
-                        onClick={() => navigate("/checkout")}
+                        // onClick={() => navigate("/checkout")}
+                        onClick={clearCheckout}
                         className="hidden md:flex absolute right-6 items-center gap-3 bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl transition cursor-pointer"
                     >
                         <div className="relative">
@@ -118,7 +121,8 @@ function Footer() {
             {/* Mobile Floating Checkout */}
             {countItems >0 && 
                 <button
-                    onClick={() => navigate("/checkout")}
+                    // onClick={() => navigate("/checkout")}
+                    onClick={clearCheckout}
                     className="fixed bottom-5 right-5 md:hidden w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-xl flex items-center justify-center cursor-pointer"
                 >
                     <div className="relative">
