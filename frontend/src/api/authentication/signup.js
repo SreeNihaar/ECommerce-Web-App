@@ -6,7 +6,7 @@ const config = import.meta.env;
 const Signup = async (userData) => {
     try{
         const response = await axios.post(
-            `${config.VITE_BACKEND_URL}/auth/signup`,
+            `${config.VITE_BACKEND_API}/auth/signup`,
              userData
         );
         
@@ -18,13 +18,12 @@ const Signup = async (userData) => {
             AuthenticationService.setUsername(responseBody.username);
             AuthenticationService.setUserRoles(responseBody.roles);
 
-            console.log("Signup successful");
         }
         return response;
-    } 
+    }
     catch(error){
         console.error("Signup failed:", error);
-        return error;
+        return error.response || { status: 500, data: { message: "Network error" } };
     }
 }
 

@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { faUserAstronaut } from "@fortawesome/free-solid-svg-icons";
-import { Link } from 'react-router-dom';
+import { faLinkedin } from "@fortawesome/free-brands-svg-icons";
+import { Link, useNavigate } from 'react-router-dom';
 
 function Navbar(){
     const [menuOpen, setMenuOpen] = useState(false);
@@ -12,35 +13,50 @@ function Navbar(){
     const [searchQuery, setSearchQuery] = useState('');
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [mobileUserMenuOpen, setMobileUserMenuOpen] = useState(false);
-    
+
+    const navigate = useNavigate();
     const userRoles = AuthenticationService.getUserRoles();
+
+    const handleSearch = () => {
+        if(searchQuery.trim()){
+            navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+            setSearchQuery('');
+            setSearchOpen(false);
+        }
+    };
+
+    const handleSearchKeyPress = (e) => {
+        if(e.key === 'Enter'){
+            handleSearch();
+        }
+    };
 
     const getMenuOptions = () => {
 
         const consumerMenu = [
-            { label: "My Orders", path: "/orders" },
+            { label: "My Orders", path: "/myorders" },
             { label: "My Profile", path: "/myprofile" },
-            { label: "My Requests", path: "/requests" },
+            { label: "My Requests", path: "/myrequests" }
         ];
 
         const merchantMenu = [
             { label: "Merchant Profile", path: "/merchant/profile" },
-            { label: "My Products", path: "/merchant/products" },
+            { label: "My Products", path: "/merchant/my_products" },
             { label: "Merchant Orders", path: "/merchant/orders" },
             { label: "Add Product", path: "/merchant/products/new" },
+            { label: "My Analytics", path: "/merchant/my_analytics"}
         ];
 
         const adminMenu = [
             { label: "Analytics", path: "/admin/analytics" },
             { label: "Users", path: "/admin/users" },
             { label: "Merchants", path: "/admin/merchants" },
-            { label: "Requests", path: "/admin/requests" },
+            { label: "Merchant Requests", path: "/admin/merchant-requests" }
         ];
 
         let result = [];
 
         for(let idx in userRoles){
-            console.log("ROLE::: ",idx, userRoles[idx]);
             if(userRoles[idx] === 'CONSUMER'){
                 result.push(...consumerMenu);
             }
@@ -55,8 +71,19 @@ function Navbar(){
     };
     return (
         <div className="Navbar bg-white shadow-md px-6 h-16 flex items-center justify-between sticky top-0 z-50">
-            <div className="app-name font-bold text-2xl text-blue-600 tracking-wide cursor-pointer">
-                <h1>My Ecommerce</h1>
+            <div className="flex items-center gap-4">
+                <div className="app-name font-bold text-2xl text-blue-600 tracking-wide cursor-pointer" onClick={()=>navigate("/")}>
+                    <h1>My Ecommerce</h1>
+                </div>
+                <a
+                    href="https://www.linkedin.com/in/sree-nihaar-chaturvedula"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-2xl text-blue-600 hover:text-blue-800 transition"
+                    title="Visit LinkedIn Profile"
+                >
+                    <FontAwesomeIcon icon={faLinkedin} />
+                </a>
             </div>
 
             {/* Desktop Menu (400px+) */}
@@ -68,6 +95,7 @@ function Navbar(){
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onBlur={() => setSearchOpen(false)}
+                        onKeyDown={handleSearchKeyPress}
                         autoFocus
                         className="w-64 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -80,10 +108,13 @@ function Navbar(){
                     </div>
                 )}
                 {(AuthenticationService.isUserLoggedIn()) ? (
-                    <>
+                    <> {(userRoles.includes('CONSUMER'))?
                         <Link to="/cart" className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition">
                             <FontAwesomeIcon icon={faCartShopping} />
                         </Link>
+                    :
+                        <></>
+                    }
                         <div className="relative">
                             <div
                                 className="text-2xl p-2 rounded-full cursor-pointer hover:bg-gray-100 hover:text-blue-600 transition"
@@ -121,7 +152,7 @@ function Navbar(){
                         Register / Login
                     </Link>
                 )}
-                
+
             </div>
 
             {/* Mobile Menu Button (<400px) */}
@@ -133,6 +164,7 @@ function Navbar(){
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onBlur={() => setSearchOpen(false)}
+                        onKeyDown={handleSearchKeyPress}
                         autoFocus
                         className="px-3 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-600 text-sm"
                     />
@@ -229,7 +261,7 @@ function Navbar(){
                             Register / Login
                         </Link>
                     )}
-                    
+
 
                     <div className="search px-5 py-4 cursor-pointer hover:bg-gray-100 flex items-center gap-3 border-b border-gray-300">
                         <input
@@ -237,6 +269,7 @@ function Navbar(){
                             placeholder="Search products..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={handleSearchKeyPress}
                             className="w-full px-3 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-600"
                         />
                     </div>

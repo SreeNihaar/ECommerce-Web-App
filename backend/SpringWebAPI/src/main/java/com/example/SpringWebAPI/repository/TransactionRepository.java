@@ -14,5 +14,5 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
     Optional<Transaction> findLatestTransaction(@Param("orderId") int orderId);
 
 
-    List<Transaction> findAllByOrderByIdAsc(int id);
+    List<Transaction> findAllByOrderIdOrderByIdAsc(int orderId);
 }

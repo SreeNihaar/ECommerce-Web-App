@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/merchant/my/analytics/")
+@RequestMapping("/api/merchant/my_analytics/")
 public class MerchantAnalyticsController {
 
     private final MerchantRepository merchantRepo;
@@ -46,10 +46,10 @@ public class MerchantAnalyticsController {
 
         Merchant merchant = this.validateMerchant();
 
-        List<CategoryAnalyticsResponseDTO> result = analyticsService.getCategorySales(merchant.getMerchantId(), status);
+        List<CategoryAnalyticsResponseDTO> result = analyticsService.getCategorySales(merchant.getId(), status);
 
         if(status==null){
-            status="COMPLETED";
+            status="DELIVERED";
         }
         return ResponseEntity.status(200).body(
                 new SuccessResponse<>("Successfully fetched the Category Sales of Order Status: "+ status.toUpperCase(),result)
@@ -62,8 +62,8 @@ public class MerchantAnalyticsController {
             @RequestParam(value = "count", required = false, defaultValue = "10") Integer count){
         Merchant merchant = this.validateMerchant();
 
-        List<TopProductDTO> result = analyticsService.getTopProducts(merchant.getMerchantId(),count);
 
+        List<TopProductDTO> result = analyticsService.getTopProducts(merchant.getId(),count);
         return ResponseEntity.status(200).body(
                 new SuccessResponse<>("Successfully Fetched the Top "+count+" Products",result)
         );

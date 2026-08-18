@@ -16,14 +16,11 @@ const CheckoutProvider = ({children}) =>{
                 };
             }
 
-            console.log(updated);
-
             return updated;
         });
     }
 
     function clearCheckout(){
-        console.log("Clearing the Checkout Items");
         setCheckoutMap({});
     }
 
@@ -37,6 +34,7 @@ const CheckoutProvider = ({children}) =>{
 const useData = () =>{
     const ctx = useContext(CheckoutContext);
     if(!ctx){
+        console.error("useData hook must be used inside CheckoutProvider");
         throw new Error("useData must be inside DataProvider");
     }
     return ctx;

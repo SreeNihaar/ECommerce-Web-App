@@ -6,6 +6,8 @@ const Login = () =>{
 
     const navigate = useNavigate();
 
+    const [showPassword,setShowPassword] = useState(false);
+
     const [credentials, setCredentials] = useState({
         username: "",
         password: ""
@@ -56,10 +58,22 @@ const Login = () =>{
             </div>
             <div className="password_div w-full">
                 <label htmlFor="password" className="font-medium text-slate-700">Password: </label>
-                <input type="password" name="password" id="password" 
+                <input type={(showPassword)?'text':'password'} name="password" id="password" 
                 placeholder="Password" 
                 className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 onChange={handlePasswordChange} />
+            </div>
+            <div className="showPassword_div flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="w-5 h-5 cursor-pointer"
+                />
+                <label htmlFor="showPassword" className="cursor-pointer">
+                    Show Password
+                </label>
             </div>
             <div className="button_div w-full">
                 <button type="button" 

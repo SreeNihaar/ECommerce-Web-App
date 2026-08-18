@@ -13,7 +13,7 @@ public class Role {
     @Getter
     @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public int roleId;
+    public int id;
 
     @Enumerated(EnumType.STRING)
     @Getter

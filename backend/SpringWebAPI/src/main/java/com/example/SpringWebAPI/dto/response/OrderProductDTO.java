@@ -11,5 +11,6 @@ public class OrderProductDTO {
     String productName;
     int productId;
     int quantity;
+    String productStatus;
     double priceAtPurchase;
 }

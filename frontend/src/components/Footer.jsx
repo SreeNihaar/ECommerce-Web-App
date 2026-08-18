@@ -1,4 +1,4 @@
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { useData } from "../context/CheckoutContext";
@@ -10,6 +10,7 @@ function Footer() {
     const [searchParams] = useSearchParams();
     const currentPage = parseInt(searchParams.get("page") || "1", 10);
     const {totalPages} = usePagination();
+    const location = useLocation();
     // const totalPages = 48;
 
     const { checkoutMap, updateCheckoutItem, clearCheckout } = useData();
@@ -44,10 +45,13 @@ function Footer() {
         return pages;
     };
 
-    const changePage = (page) =>{
+    const changePage = (page) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("page", page);
+
         navigate({
-            pathname: "/products",
-            search: `?page=${page}`
+            pathname: location.pathname,
+            search: `?${params.toString()}`
         });
     };
 
@@ -91,7 +95,7 @@ function Footer() {
 
                     <button
                         onClick={() => changePage(Math.min(totalPages,currentPage+1))}
-                        disabled={currentPage === totalPages}
+                        disabled={currentPage === totalPages || totalPages===0}
                         className={`${
                             currentPage === totalPages ? "" : "cursor-pointer"
                         } px-4 py-2 text-blue-600 disabled:text-gray-400`}
@@ -103,8 +107,7 @@ function Footer() {
                 {/* Desktop Checkout */}
                 {countItems > 0 &&
                     <button
-                        // onClick={() => navigate("/checkout")}
-                        onClick={clearCheckout}
+                        onClick={() => navigate("/checkout")}
                         className="hidden md:flex absolute right-6 items-center gap-3 bg-red-500 hover:bg-red-600 text-white px-5 py-3 rounded-xl transition cursor-pointer"
                     >
                         <div className="relative">
@@ -119,10 +122,9 @@ function Footer() {
             </footer>
 
             {/* Mobile Floating Checkout */}
-            {countItems >0 && 
+            {countItems >0 &&
                 <button
-                    // onClick={() => navigate("/checkout")}
-                    onClick={clearCheckout}
+                    onClick={() => navigate("/checkout")}
                     className="fixed bottom-5 right-5 md:hidden w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-xl flex items-center justify-center cursor-pointer"
                 >
                     <div className="relative">

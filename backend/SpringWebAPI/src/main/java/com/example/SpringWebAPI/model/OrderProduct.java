@@ -1,5 +1,6 @@
 package com.example.SpringWebAPI.model;
 
+import com.example.SpringWebAPI.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,8 @@ public class OrderProduct {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
+    private OrderStatus productStatus;
 
     private double priceAtPurchase;
 

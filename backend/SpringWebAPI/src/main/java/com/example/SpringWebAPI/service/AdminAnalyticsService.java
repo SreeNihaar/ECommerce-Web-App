@@ -3,12 +3,11 @@ package com.example.SpringWebAPI.service;
 import com.example.SpringWebAPI.dto.response.RevenueDataDTO;
 import com.example.SpringWebAPI.dto.response.SimpleOrderDTO;
 import com.example.SpringWebAPI.dto.response.TopMerchantDTO;
-import com.example.SpringWebAPI.model.enums.OrderStatus;
 import com.example.SpringWebAPI.repository.AdminAnalyticsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AdminAnalyticsService {
     private final AdminAnalyticsRepository analyticsRepo;
@@ -28,7 +28,9 @@ public class AdminAnalyticsService {
         int m = month != null ? month : LocalDate.now().getMonthValue();
         int y = year != null ? year : LocalDate.now().getYear();
 
+        log.info("Fetching revenue analytics - Month: {}, Year: {}", m, y);
         List<SimpleOrderDTO> orders = analyticsRepo.getOrdersForMonth(m, y);
+        log.debug("Retrieved {} orders for month {}/{}", orders.size(), m, y);
 
         Map<Integer, RevenueDataDTO> weekGroups = new LinkedHashMap<>();
 
@@ -46,11 +48,16 @@ public class AdminAnalyticsService {
             week.setOrderCount(week.getOrderCount() + 1);
         }
 
-        return new ArrayList<>(weekGroups.values());
+        List<RevenueDataDTO> result = new ArrayList<>(weekGroups.values());
+        log.debug("Revenue data processed - Total weeks: {}, Total orders: {}", result.size(), orders.size());
+        return result;
     }
 
     public List<TopMerchantDTO> getTopMerchants(int count) {
-        return analyticsRepo.getTopMerchants(count);
+        log.info("Fetching top {} merchants by revenue", count);
+        List<TopMerchantDTO> topMerchants = analyticsRepo.getTopMerchants(count);
+        log.debug("Retrieved {} top merchants", topMerchants.size());
+        return topMerchants;
     }
 
 }

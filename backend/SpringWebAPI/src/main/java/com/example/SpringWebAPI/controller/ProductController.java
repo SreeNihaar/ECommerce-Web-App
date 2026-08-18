@@ -1,29 +1,22 @@
 package com.example.SpringWebAPI.controller;
 
-import com.example.SpringWebAPI.dto.request.ProductRequestDTO;
-import com.example.SpringWebAPI.dto.request.ProductToCartDTO;
+import com.example.SpringWebAPI.dto.request.EditProductRequestDTO;
+import com.example.SpringWebAPI.dto.request.NewProductRequestDTO;
 import com.example.SpringWebAPI.dto.response.PageResponseDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseByIdDTO;
 import com.example.SpringWebAPI.dto.response.ProductResponseDTO;
-import com.example.SpringWebAPI.exception.ProductNotFoundException;
-import com.example.SpringWebAPI.model.*;
 import com.example.SpringWebAPI.response.SuccessResponse;
 import com.example.SpringWebAPI.service.ProductService;
 
-import com.example.SpringWebAPI.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -31,8 +24,6 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private UserService userService;
 
     // GET All Products
     @GetMapping({"","/"})
@@ -60,42 +51,25 @@ public class ProductController {
         );
     }
 
-    // Add Product to Cart. Only accessible to CONSUMER
-    @PostMapping({"/{id}","/{id}/"})
-    @PreAuthorize("hasRole('CONSUMER')")
-    public ResponseEntity<SuccessResponse<String>> addProductToCart(@RequestBody ProductToCartDTO request){
-
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        System.out.println("Calling the addProductToCart");
-
-        userService.addProductToCart(userName,request);
-
-        return ResponseEntity.status(200).body(
-                new SuccessResponse<>("Added Product to Cart",
-                        "Product Id: "+request.getProductId())
-        );
-    }
 
     // Add a new Product. Only accessible to MERCHANT and ADMIN
     @PostMapping("/newProduct")
-    @PreAuthorize("hasAnyRole('MERCHANT','ADMIN')")
-    public ResponseEntity<SuccessResponse<Integer>> addProduct(@RequestPart Product product, @RequestPart MultipartFile image) throws IOException{
-            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+    @PreAuthorize("hasAnyRole('MERCHANT')")
+    public ResponseEntity<SuccessResponse<Integer>> addProduct(@RequestPart("product") NewProductRequestDTO productDto, @RequestPart("image") MultipartFile image) throws IOException{
 
-            int id = productService.addProduct(userName,product,image);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>(
-                    "Product added with id: "+id,
-                    id
-            ));
+        int id = productService.addProduct(productDto,image);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SuccessResponse<>(
+                "Product added with id: "+id,
+                id
+        ));
     }
 
     // Update the Product with id. Only accessible to MERCHANT and ADMIN
-    @PutMapping("/{id}/update_product")
+    @PatchMapping("/{id}/edit")
     @PreAuthorize("hasAnyRole('MERCHANT','ADMIN')")
-    public ResponseEntity<SuccessResponse<Integer>> updateProduct(@RequestPart Product product, @PathVariable int id, @RequestPart MultipartFile image) throws IOException{
-            productService.updateProduct(product, id,image);
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<Integer>(
+    public ResponseEntity<SuccessResponse<Integer>> updateProduct(@PathVariable int id,@RequestPart("productDto") EditProductRequestDTO productDto, @RequestPart(value = "image", required = false) MultipartFile image) throws IOException{
+            productService.updateProduct(productDto, id,image);
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                     "Product with id: "+id+" Updated Successfully",
                     id
             ));
@@ -104,9 +78,9 @@ public class ProductController {
     // Delete the Product with id. Only accessible to MERCHANT and ADMIN
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('MERCHANT','ADMIN')")
-    public ResponseEntity<SuccessResponse<Integer>> deleteProduct(@PathVariable int id){
+    public ResponseEntity<SuccessResponse<Integer>> deleteProduct(@PathVariable int id) throws IOException{
             productService.deleteProduct(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<Integer>(
+            return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                     "Product Deleted Successfully",
                     id
             ));
@@ -114,13 +88,30 @@ public class ProductController {
 
     // Search the Products with Keyword. (Mostly searches the products name, description and category)
     @GetMapping("/search")
-    public ResponseEntity<SuccessResponse<List<ProductResponseDTO>>> searchProduct(@RequestParam String keywords){
-            System.out.println("Controller: "+keywords);
-            List<ProductResponseDTO> result = productService.search(keywords);
+    public ResponseEntity<SuccessResponse<PageResponseDTO<ProductResponseDTO>>> searchProduct(@RequestParam("query") String keywords,
+                                                                                              @RequestParam(value = "page",defaultValue = "1") int page,
+                                                                                               @RequestParam(value = "size",defaultValue = "8") int size){
+
+
+            PageResponseDTO<ProductResponseDTO> result = productService.search(page-1,size,keywords);
             return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                     "Prodcuts Fetch Successfully",
                     result
             ));
+    }
+
+    @GetMapping("/my_products")
+    @PreAuthorize("hasRole('MERCHANT')")
+    public ResponseEntity<SuccessResponse<PageResponseDTO<ProductResponseDTO>>> getAllProductsOfMerchant(@RequestParam(defaultValue = "1") int page,
+                                                                                               @RequestParam(defaultValue = "8") int size){
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        PageResponseDTO<ProductResponseDTO> result = productService.findProductsOfMerchant(userName,page-1,size);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new SuccessResponse<>(
+                        "Success",
+                        result
+                )
+        );
     }
 
 

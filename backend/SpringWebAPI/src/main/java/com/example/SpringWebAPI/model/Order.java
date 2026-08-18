@@ -5,9 +5,11 @@ import com.example.SpringWebAPI.model.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Entity
@@ -34,7 +36,10 @@ public class Order {
     private double totalPrice;
 
     @CreationTimestamp
-    private Instant orderDate;
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    private Instant updatedAt;
 
     @Column(nullable = false)
     private OrderStatus orderStatus;
@@ -53,13 +58,22 @@ public class Order {
             orderStatus=OrderStatus.PAYMENT_PENDING;
         }
         else if(transaction.getTransactionStatus() == TransactionStatus.SUCCESS){
-            orderStatus=OrderStatus.PAYMENT_COMPLETED;
+            orderStatus=OrderStatus.PROCESSING;
         }
         else{
             throw new RuntimeException("Invalid Transaction Status");
         }
         transaction.setOrder(this);
         transactions.add(transaction);
+    }
+
+    public void updateOrderStatus() {
+        OrderStatus minStatus = orderProducts.stream()
+                .map(OrderProduct::getProductStatus)
+                .min(Comparator.comparingInt(OrderStatus::getPriority))
+                .orElse(OrderStatus.PAYMENT_PENDING);
+
+        this.orderStatus = minStatus;
     }
 
 }

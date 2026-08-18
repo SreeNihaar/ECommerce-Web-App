@@ -11,17 +11,17 @@ const Profile = () =>{
 
     useEffect(()=>{
         if(!AuthenticationService.isUserLoggedIn()){
-            navigate("/login");        
+            navigate("/login");
         }
         UserService.getMyProfile(AuthenticationService.getToken())
             .then((res)=>{
-                console.log(res);
                 setProfile(res);
             })
             .catch((err)=>{
-                console.log(err);
+                console.error("Failed to get Profile");
             })
     },[]);
+
 
     return <>
 
@@ -29,7 +29,7 @@ const Profile = () =>{
     <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden">
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white">
+        <div className="bg-linear-to-r from-blue-600 to-indigo-600 p-8 text-white">
             <div className="flex items-center gap-5">
                 <div className="w-20 h-20 rounded-full bg-white text-blue-600 flex items-center justify-center text-3xl font-bold">
                     {profile.firstname?.charAt(0).toUpperCase()}
@@ -106,7 +106,7 @@ const Profile = () =>{
             </div>
 
             <div className="mt-8 flex justify-end">
-                <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition cursor-pointer" onClick={() => navigate("/myprofile/edit",{replace: true})}>
                     Edit Profile
                 </button>
             </div>

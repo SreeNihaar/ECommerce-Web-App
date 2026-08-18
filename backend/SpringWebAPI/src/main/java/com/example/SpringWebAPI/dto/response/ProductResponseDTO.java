@@ -15,7 +15,6 @@ public class ProductResponseDTO {
     Double price;
     Integer quantity;
     Double rating;
-    String imageName;
-    String imageType;
-    byte[] imageData;
+    Integer reviewCount;
+    String imageKey;
 }

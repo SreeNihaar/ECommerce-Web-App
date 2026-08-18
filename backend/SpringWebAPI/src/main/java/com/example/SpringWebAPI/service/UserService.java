@@ -1,60 +1,46 @@
 package com.example.SpringWebAPI.service;
 
-import com.example.SpringWebAPI.dto.request.MerchantRequestDTO;
+import com.example.SpringWebAPI.dto.request.EditProfileRequestDTO;
 import com.example.SpringWebAPI.dto.request.ProductToCartDTO;
-import com.example.SpringWebAPI.dto.request.UpdateStatusRequestDTO;
-import com.example.SpringWebAPI.dto.response.MerchantRequestResponseDTO;
-import com.example.SpringWebAPI.dto.response.MyCartResponseDTO;
-import com.example.SpringWebAPI.dto.response.ProfileResponseDTO;
-import com.example.SpringWebAPI.exception.MerchantRequestNotFoundException;
+import com.example.SpringWebAPI.dto.response.*;
 import com.example.SpringWebAPI.exception.ProductNotFoundException;
 import com.example.SpringWebAPI.exception.UserNotFoundException;
 import com.example.SpringWebAPI.model.*;
-import com.example.SpringWebAPI.model.enums.RequestStatus;
-import com.example.SpringWebAPI.model.enums.UserRole;
 import com.example.SpringWebAPI.repository.*;
 import com.example.SpringWebAPI.exception.UsernameNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
-public class UserService {
+public class UserService extends ParentService{
     private final UserRepository userRepo;
-
-    private final MerchantRequestRepository roleRequestRepo;
 
     private final CartRepository cartRepo;
 
     private final ProductRepository productRepo;
 
-    private final RoleService roleService;
-
-    private final MerchantService merchantService;
-
     public UserService(UserRepository userRepo,
-                       MerchantRequestRepository roleRequestRepo,
                        CartRepository cartRepo,
-                       ProductRepository productRepo,
-                       RoleService roleService,
-                       MerchantService merchantService){
+                       ProductRepository productRepo){
         this.userRepo=userRepo;
-        this.roleRequestRepo=roleRequestRepo;
         this.cartRepo=cartRepo;
         this.productRepo=productRepo;
-        this.roleService=roleService;
-        this.merchantService=merchantService;
     }
 
-    public List<User> findAllUsers(){
-        return userRepo.findAll();
-    }
-
+    @Transactional
     public int addUser(User user){
+        log.info("Adding new user with username: {}", user.getUsername());
         User savedUser = userRepo.save(user);
-        return savedUser.getUserId();
+        log.debug("User saved successfully with ID: {}", savedUser.getId());
+        return savedUser.getId();
     }
 
     public ProfileResponseDTO getMyProfile(String username){
@@ -71,127 +57,56 @@ public class UserService {
         return responseDTO;
     }
 
-    public User getUserById(int id){
-        System.out.println("Finding user by id");
-        return userRepo.findById(id).orElseThrow(()-> new UserNotFoundException("User not found with id: ",id));
-    }
+    public ProfileResponseDTO getUserById(int id){
+        log.info("Fetching user profile by ID: {}", id);
+        User user = userRepo.findById(id).orElseThrow(()-> new UserNotFoundException("User not found with id: ",id));
 
-    public void deleteUserById(int id){
-        System.out.println("Deleting user");
-        userRepo.deleteById(id);
-    }
+        ProfileResponseDTO result = new ProfileResponseDTO();
+        result.setUsername(user.getUsername());
+        result.setFirstname(user.getFirstName());
+        result.setLastname(user.getLastName());
+        result.setPhonenumber(user.getPhoneNumber());
+        result.setAddress(user.getAddress());
+        result.setRoles(user.getRoles().stream().map(role -> role.getRoleName().toString()).toList());
+        result.setTotalOrders(user.getOrders().size());
 
-    public void updateUserById(User user,int id){
-        System.out.println("Updating User");
-        user.setUserId(id);
-        userRepo.save(user);
-    }
-
-    public int postRoleRequest(MerchantRequestDTO requestDTO) throws UsernameNotFoundException{
-        User user = userRepo.findByUsername(requestDTO.getUsername()).
-                orElseThrow(()->new UsernameNotFoundException("Mentioned Username is not Found"));
-
-        MerchantRequest request = new MerchantRequest();
-
-        request.setUser(user);
-        request.setContactNumber(requestDTO.getContactNumber());
-        request.setStatus(RequestStatus.PENDING);
-        request.setGstNumber(requestDTO.getGstNumber());
-        request.setLegalBusinessName(requestDTO.getLegalBusinessName());
-        request.setDescription(requestDTO.getDescription());
-
-        MerchantRequest savedRequest = roleRequestRepo.save(request);
-        return savedRequest.getRequestId();
-    }
-
-    public List<MerchantRequest> getAllRequests(){
-        List<MerchantRequest> result = new ArrayList<>();
-        result = roleRequestRepo.findAll();
         return result;
     }
 
-    public MerchantRequest getMerchantRequestById(int id){
-        MerchantRequest request = roleRequestRepo.findById(id).orElseThrow( () ->
-                new MerchantRequestNotFoundException("Requested Merchant Request Not Found" )
-        );
-        return request;
+    public void deleteUserById(int id){
+        log.info("Deleting user with ID: {}", id);
+        userRepo.deleteById(id);
+        log.debug("User with ID: {} deleted successfully", id);
     }
-
 
     @Transactional
-    public String updateStatus(int id,UpdateStatusRequestDTO statusRequest){
-        String status=statusRequest.getStatus().toUpperCase();
+    public void editUserDetails(EditProfileRequestDTO requestDTO,String userName){
+        log.info("Updating user profile for username: {}", userName);
+        User user = userRepo.findByUsername(userName).orElseThrow(()-> new UsernameNotFoundException("Username Not Found"));
 
-        RequestStatus statusEnum = RequestStatus.valueOf(status);
+        user.setFirstName(requestDTO.getFirstname());
+        user.setLastName(requestDTO.getLastname());
+        user.setPhoneNumber(requestDTO.getPhonenumber());
+        user.setAddress(requestDTO.getAddress());
 
-        MerchantRequest request = this.getMerchantRequestById(id);
-
-        if (request.getStatus() == RequestStatus.APPROVED) {
-            throw new RuntimeException("Request already approved");
-        }
-
-        request.setStatus(statusEnum);
-
-        this.saveMerchantRequest(request);
-
-        if(statusEnum == RequestStatus.APPROVED){
-            return "Created Merchant Account Successfully, merchant Id: "+createMerchantAccount(request);
-        }
-
-        return statusEnum.toString();
+        log.debug("User details updated - Name: {} {}, Phone: {}, Address: {}",
+            requestDTO.getFirstname(), requestDTO.getLastname(), requestDTO.getPhonenumber(), requestDTO.getAddress());
+        userRepo.save(user);
+        log.debug("User profile saved successfully for username: {}", userName);
     }
 
-    // Create a merchant account with given Merchant Request
-
-    private int createMerchantAccount(MerchantRequest request){
-        Merchant merchant = new Merchant();
-
-        Role role = roleService.getRole(UserRole.MERCHANT);
-        merchant.setApproved(true);
-
-        merchant.setUser(request.getUser());
-        merchant.setLegalBusinessName(request.getLegalBusinessName());
-        merchant.setBusinessPhone(request.getContactNumber());
-        merchant.setGstNumber(request.getGstNumber());
-
-        merchant.getUser().appendRole(role);
-
-        return merchantService.saveMerchantUser(merchant);
-    }
-
-    public MerchantRequestResponseDTO getMerchantRequestByIdDTO(int id){
-        MerchantRequest request = this.getMerchantRequestById(id);
-
-        MerchantRequestResponseDTO response = new MerchantRequestResponseDTO();
-
-        response.setRequestId(request.getRequestId());
-        response.setUsername(request.getUser().getUsername());
-        response.setDescription(request.getDescription());
-        response.setGstNumber(request.getGstNumber());
-        response.setCreatedAt(request.getCreatedAt());
-        response.setUpdatedAt(request.getUpdatedAt());
-        response.setContactNumber(request.getContactNumber());
-        response.setLegalBusinessName(request.getLegalBusinessName());
-        response.setStatus(request.getStatus().toString());
-
-        return response;
-    }
-
-    public void saveMerchantRequest(MerchantRequest request){
-        roleRequestRepo.save(request);
-    }
-
+    @Transactional
     public void addProductToCart(String userName, ProductToCartDTO request){
-
-        System.out.println("Inside the method");
+        log.info("Adding product {} to cart for user: {}, quantity: {}",
+            request.getProductId(), userName, request.getQuantity());
 
         Cart userCart = cartRepo.findByUserUsername(userName).orElse(new Cart());
 
         if(userCart.getUser() == null){
+            log.debug("Creating new cart for user: {}", userName);
             User user = userRepo.findByUsername(userName).orElseThrow(
                     () -> new UsernameNotFoundException("UserName not found")
-            );;
-
+            );
             userCart.setUser(user);
         }
 
@@ -200,8 +115,10 @@ public class UserService {
         );
 
         userCart.addProduct(product,request.getQuantity());
+        log.debug("Product added to cart - Product ID: {}, Quantity: {}", request.getProductId(), request.getQuantity());
 
-        cartRepo.save(userCart); // To save the changes and Cascade takes care to save the CartProduct.
+        cartRepo.save(userCart);
+        log.debug("Cart saved successfully for user: {}", userName);
     }
 
 
@@ -218,7 +135,7 @@ public class UserService {
         for(CartProduct item: result){
             MyCartResponseDTO dto = new MyCartResponseDTO();
 
-            dto.setProductId(item.getProduct().getProductId());
+            dto.setProductId(item.getProduct().getId());
             dto.setProductName(item.getProduct().getProductName());
             dto.setPrice(item.getProduct().getPrice());
             dto.setQuantity(item.getQuantity());
@@ -226,6 +143,34 @@ public class UserService {
             responseList.add(dto);
         }
         return responseList;
+    }
+
+    public PageResponseDTO<UserCollection> getAllUsers(int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepo.findAll(pageable);
+
+        PageResponseDTO<UserCollection> result = new PageResponseDTO<>();
+        result.setLast(users.isLast());
+        result.setPage(users.getNumber());
+        result.setSize(users.getSize());
+        result.setTotalPages(users.getTotalPages());
+        result.setTotalElements(users.getTotalElements());
+
+        List<UserCollection> content = new ArrayList<>();
+        for(User user: users){
+            UserCollection obj = new UserCollection();
+            obj.setUserId(user.getId());
+            obj.setUsername(user.getUsername());
+            obj.setCreatedAt(user.getCreatedAt());
+            obj.setUpdatedAt(user.getUpdatedAt());
+            obj.setTotalOrders(user.getOrders().size());
+            content.add(obj);
+        }
+
+        result.setContent(content);
+
+        return result;
     }
 
 }

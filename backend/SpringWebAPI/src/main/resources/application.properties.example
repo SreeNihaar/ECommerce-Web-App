@@ -1,13 +1,42 @@
 spring.application.name=SpringWebAPI
 
+frontend.url=http://localhost:5173
+
+# ===============================
+# Database
+# ===============================
 spring.datasource.url=jdbc:postgresql://localhost:5432/springdb
 spring.datasource.driver-class-name=org.postgresql.Driver
 spring.datasource.username=postgres
-spring.datasource.password=sreenihaar
+spring.datasource.password=password123
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
-jwt.secret=ThisIsExampleJwtSecretUsedForDevelopment123789
+# ===============================
+# JWT
+# ===============================
+jwt.secret=eyafjbwfbe.nadf6e13he71y.qwge13881dhg
 jwt.expiration=3600000
 
+# ===============================
+# AWS
+# ===============================
+cloud.aws.credentials.access-key=jafbqwjfuj676dhudhunGYGj7865
+cloud.aws.credentials.secret-key=jnug77fh7h8q8
+cloud.aws.region.static=us-east-2
+aws.bucket.name=some-random-bucket-name
+
+# ===============================
+# Logging
+# ===============================
+logging.level.root=INFO
+logging.level.com.example.SpringWebAPI=INFO
+logging.level.org.springframework.security=WARN
+
+# ===============================
+# Log File
+# ===============================
+logging.file.name=logs/application.log
+logging.file.max-size=10MB
+logging.file.max-history=10

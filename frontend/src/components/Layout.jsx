@@ -1,15 +1,18 @@
 import { Outlet } from "react-router-dom";
+import { Suspense } from "react";
 import Navbar from "./Navbar";
+import Loading from "./Loading";
 import Footer from "./Footer";
-import { CheckoutProvider } from "../context/CheckoutContext";
 
 const Layout = () =>{
     return (
         <div className="layout flex flex-col min-h-screen">
             <Navbar />
-                <main className="flex-1 flex items-center justify-center">
-                    <Outlet />
-                </main>
+                <Suspense fallback={<Loading />}>
+                    <main className="flex-1 w-full">
+                        <Outlet />
+                    </main>
+                </Suspense>
             <Footer />
         </div>
     );

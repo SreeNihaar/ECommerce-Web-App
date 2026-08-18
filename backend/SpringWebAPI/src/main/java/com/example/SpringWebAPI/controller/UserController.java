@@ -1,21 +1,16 @@
 package com.example.SpringWebAPI.controller;
 
-import com.example.SpringWebAPI.dto.request.MerchantRequestDTO;
-import com.example.SpringWebAPI.dto.response.MyCartResponseDTO;
-import com.example.SpringWebAPI.dto.response.ProfileResponseDTO;
-import com.example.SpringWebAPI.model.Cart;
-import com.example.SpringWebAPI.model.CartProduct;
+import com.example.SpringWebAPI.dto.request.EditProfileRequestDTO;
+import com.example.SpringWebAPI.dto.response.*;
+import com.example.SpringWebAPI.exception.UnAuthorizedException;
 import com.example.SpringWebAPI.model.User;
-import com.example.SpringWebAPI.repository.CartRepository;
 import com.example.SpringWebAPI.response.SuccessResponse;
 import com.example.SpringWebAPI.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,19 +26,21 @@ public class UserController {
     }
 
     @GetMapping({ "/{id}" , "/{id}/" })
-    public ResponseEntity<SuccessResponse<User>> getUserById(@RequestParam int id){
-        User user = service.getUserById(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SuccessResponse<ProfileResponseDTO>> getUserById(@PathVariable("id") int id){
+        ProfileResponseDTO response = service.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                 "Fetched the User Successfully",
-                user
+                response
         ));
     }
+
 
     @GetMapping({"/myprofile"})
     public ResponseEntity<SuccessResponse<ProfileResponseDTO>> getMyProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null){
-            throw new RuntimeException("Un-Authorized");
+            throw new UnAuthorizedException("User is Unauthorized. Please Login/SignUp.");
         }
         String userName = authentication.getName();
         ProfileResponseDTO responseDTO = service.getMyProfile(userName);
@@ -74,12 +71,17 @@ public class UserController {
         ));
     }
 
-    @PatchMapping({ "/{id}/edit" , "/{id}/edit/" })
-    public ResponseEntity<SuccessResponse<Integer>> editUser(@RequestParam int id, @RequestBody User user){
-        service.updateUserById(user,id);
+    @PatchMapping({ "/myprofile/edit" , "/myprofile/edit/" })
+    public ResponseEntity<SuccessResponse<String>> editUser(@RequestBody EditProfileRequestDTO requestDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null){
+            throw new RuntimeException("Un-Authorized");
+        }
+        String userName = authentication.getName();
+        service.editUserDetails(requestDTO,userName);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                 "Updated User successfully",
-                id
+                "Success"
         ));
     }
 
@@ -88,16 +90,6 @@ public class UserController {
         service.deleteUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
                 "Deleted User Successfully",
-                id
-        ));
-    }
-
-    @PostMapping({"/new_merchant_request"})
-    @PreAuthorize("hasRole('ROLE_CONSUMER')")
-    public ResponseEntity<SuccessResponse<Integer>> postNewMerchantRequest(@RequestBody MerchantRequestDTO request){
-        int id = service.postRoleRequest(request);
-        return ResponseEntity.status(HttpStatus.OK).body(new SuccessResponse<>(
-                "New Request Successfully posted.",
                 id
         ));
     }

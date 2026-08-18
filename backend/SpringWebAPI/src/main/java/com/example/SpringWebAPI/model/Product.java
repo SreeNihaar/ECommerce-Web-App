@@ -3,10 +3,12 @@ package com.example.SpringWebAPI.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,19 +20,20 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "prod_seq")
     @SequenceGenerator(name = "prod_seq", sequenceName = "prod_seq", allocationSize = 1,initialValue = 101)
-    private Integer productId;
+    private Integer id;
     private String productName;
     private String description;
     private String category;
     private Double price;
     private Integer stock;
+    @ColumnDefault("0.0")
     private Double rating;
+    @ColumnDefault("0")
+    private Integer reviewCount;
 
     //Image
     // private String image_s3_url; // Need to replace it after creating the S3
-    private String imageName;
-    private String imageType;
-    private byte[] imageData;
+    private String imageKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Merchant merchant;
@@ -38,6 +41,9 @@ public class Product {
     @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderProduct> orderProducts;
+
+    @OneToMany(mappedBy = "product",fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)

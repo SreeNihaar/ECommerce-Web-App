@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JWTService {
 
@@ -50,9 +52,10 @@ public class JWTService {
     }
 
     public String generateToken(String username){
+        log.debug("Generating JWT token for user: {}", username);
         Map<String,Object> claims = new HashMap<>();
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
@@ -61,6 +64,8 @@ public class JWTService {
                 .and()
                 .signWith(getSecretKey())
                 .compact();
+        log.debug("JWT token generated successfully for user: {}", username);
+        return token;
     }
 
     public boolean isTokenExpired(String token){
@@ -69,7 +74,19 @@ public class JWTService {
 
     public boolean validToken(String token, UserDetails userDetails){
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        boolean isExpired = isTokenExpired(token);
+        boolean usernameMatches = username.equals(userDetails.getUsername());
+
+        if (isExpired) {
+            log.warn("JWT token validation failed - Token expired for user: {}", username);
+            return false;
+        }
+        if (!usernameMatches) {
+            log.warn("JWT token validation failed - Username mismatch");
+            return false;
+        }
+        log.debug("JWT token validated successfully for user: {}", username);
+        return true;
     }
 
 }
