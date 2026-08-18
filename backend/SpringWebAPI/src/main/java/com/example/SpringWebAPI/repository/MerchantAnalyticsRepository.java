@@ -25,7 +25,7 @@ public interface MerchantAnalyticsRepository extends JpaRepository<OrderProduct,
     FROM OrderProduct op
     JOIN op.product p
     JOIN op.order o
-    WHERE p.merchant.merchantId = :merchantId
+    WHERE p.merchant.id = :merchantId
       AND o.orderStatus = :status
     GROUP BY p.category
     ORDER BY SUM(op.priceAtPurchase * op.stock) DESC
@@ -34,14 +34,14 @@ public interface MerchantAnalyticsRepository extends JpaRepository<OrderProduct,
 
     @Query("""
     SELECT new com.example.SpringWebAPI.dto.response.TopProductDTO(
-        p.productId,
+        p.id,
         p.productName,
         SUM(op.stock)
     )
     FROM OrderProduct op
     JOIN op.product p
-    WHERE p.merchant.merchantId = :merchantId
-    GROUP BY p.productId, p.productName
+    WHERE p.merchant.id = :merchantId
+    GROUP BY p.id, p.productName
     ORDER BY SUM(op.stock) DESC
     """)
     List<TopProductDTO> getTopSellingProducts(@Param("merchantId") int merchantId, Pageable pageable);

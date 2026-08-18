@@ -23,7 +23,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
     @SequenceGenerator(name="user_seq", sequenceName = "user_seq", allocationSize = 1)
-    private int userId;
+    private int id;
 
     @Column(unique = true,nullable = false)
     private String username;
@@ -52,6 +52,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -9,9 +9,12 @@ import com.example.SpringWebAPI.model.Role;
 import com.example.SpringWebAPI.model.User;
 import com.example.SpringWebAPI.model.enums.UserRole;
 import com.example.SpringWebAPI.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -42,8 +46,10 @@ public class AuthService {
 
     @Transactional
     public JWTResponseDTO createUser(UserSignUpRequestDTO userReq){
+        log.info("Creating new user account for username: {}", userReq.getUsername());
 
         if(isUsernameExists(userReq.getUsername())){
+            log.warn("Sign up attempt with existing username: {}", userReq.getUsername());
             throw new UsernameAlreadyExistsException("Username already Exists");
         }
 
@@ -58,41 +64,57 @@ public class AuthService {
         user.appendRole(role);
 
         User savedUser = userRepo.save(user);
+        log.debug("User saved with ID: {} and role: {}", savedUser.getId(), role.getRoleName());
 
         String jwtToken = jwtService.generateToken(savedUser.getUsername());
+        log.debug("JWT token generated for user: {}", savedUser.getUsername());
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(savedUser, null, savedUser.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        log.debug("Authentication token set in security context");
 
         JWTResponseDTO result = new JWTResponseDTO();
         result.setAccessToken(jwtToken);
         result.setExpiration(jwtService.extractExpiration(jwtToken));
         result.setUsername(savedUser.getUsername());
-        result.appendRole(role.toString());
+        result.appendRole(role.getRoleName().toString());
 
+        log.info("User account created successfully for username: {}", savedUser.getUsername());
         return result;
     }
 
     public JWTResponseDTO verify(LoginRequestDTO request){
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
+        log.info("Login attempt for username: {}", request.getUsername());
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
             if(authentication.isAuthenticated()){
                 User userDetails = (User) authentication.getPrincipal();
                 String token = jwtService.generateToken(request.getUsername());
+                log.debug("JWT token generated for login user: {}", request.getUsername());
+
                 JWTResponseDTO responseDTO = new JWTResponseDTO();
                 responseDTO.setAccessToken(token);
                 responseDTO.setUsername(jwtService.extractUsername(token));
                 if(userDetails != null){
                     List<String> roles = userDetails.getRoles().stream().map(role -> role.getRoleName().toString()).toList();
                     responseDTO.setRoles(roles);
+                    log.debug("User authenticated with roles: {}", roles);
                 }
                 responseDTO.setExpiration(jwtService.extractExpiration(token));
 
+                log.info("User {} logged in successfully", request.getUsername());
                 return responseDTO;
             }
             throw new UsernameNotFoundException("Username or Password Incorrect");
+        } catch (AuthenticationException e) {
+            log.warn("Login failed for username: {}", request.getUsername());
+            throw new BadCredentialsException("Username or Password Incorrect");
+        }
     }
 
     public boolean isUsernameExists(String username){

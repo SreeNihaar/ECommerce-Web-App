@@ -15,7 +15,9 @@ import java.time.Instant;
 @AllArgsConstructor
 public class MerchantRequest {
     @Id
-    private int requestId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "merchant_request_seq")
+    @SequenceGenerator(name="merchant_request_seq", sequenceName = "merchant_request_seq", allocationSize = 1)
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;

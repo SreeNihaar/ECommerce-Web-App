@@ -40,8 +40,13 @@ class AuthenticationService {
         if(roles === null || roles.trim() === null){
             return [];
         }
-        const rolesArray = JSON.parse(roles);
-        return rolesArray;
+        try {
+            const rolesArray = JSON.parse(roles);
+            return rolesArray;
+        } catch (err) {
+            console.error('Failed to parse user roles from storage:', err);
+            return [];
+        }
     }
 
     getUsername(){
@@ -52,6 +57,11 @@ class AuthenticationService {
     getExpiration(){
         const date = localStorage.getItem('expiration');
         return date;
+    }
+
+    handleExpiredToken(){
+        this.logout();
+        window.location.href='/login';
     }
 }
 

@@ -14,7 +14,9 @@ const SignUp = () =>{
     });
 
     const [confirmPassword, setConfirmPassword] = useState("");
-
+    
+    const [showPassword,setShowPassword] = useState(false);
+    
     const [error,setError] = useState(null);
 
     const passwordConfirmation = ()=>{
@@ -76,14 +78,14 @@ const SignUp = () =>{
 
                 <div >
                     <label htmlFor="password" className="font-medium text-slate-700">Password:</label>
-                    <input type="password" name="password" id="password" placeholder="Password"
+                    <input type={(showPassword)?'text':'password'} name="password" id="password" placeholder="Password"
                     className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     onChange={(e) => setUserData({...userData, password: e.target.value})} />
                 </div>
                 
                 <div >
                     <label htmlFor="confirmPassword" className="font-medium text-slate-700">Confirm Password:</label>
-                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password"
+                    <input type={(showPassword)?'text':'password'} name="confirmPassword" id="confirmPassword" placeholder="Confirm Password"
                     className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     onChange={(e) => setConfirmPassword(e.target.value)} />
                 </div>
@@ -107,6 +109,19 @@ const SignUp = () =>{
                     <input type="text" name="address" id="address" placeholder="Address"
                     className="w-full mt-2 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                     onChange={(e) => setUserData({...userData, address: e.target.value})} />
+                </div>
+
+                <div className="showPassword_div flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id="showPassword"
+                        checked={showPassword}
+                        onChange={(e) => setShowPassword(e.target.checked)}
+                        className="w-5 h-5 cursor-pointer"
+                    />
+                    <label htmlFor="showPassword" className="cursor-pointer">
+                        Show Password
+                    </label>
                 </div>
 
             </div>

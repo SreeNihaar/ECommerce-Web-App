@@ -1,19 +1,20 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "../Navbar";
 import { Suspense } from "react";
+import Navbar from "../Navbar";
 import Loading from "../Loading";
 
-const ProductLayout = () =>{
+const NavbarLayout = () => {
     return (
-        <div className="layout flex flex-col min-h-screen">
+        <div className="min-h-screen flex flex-col bg-slate-50">
             <Navbar />
-            <main className="flex-1 flex items-center justify-center">
+
+            <main className="flex-1">
                 <Suspense fallback={<Loading />}>
                     <Outlet />
                 </Suspense>
             </main>
         </div>
     );
-}
+};
 
-export default ProductLayout;
+export default NavbarLayout;

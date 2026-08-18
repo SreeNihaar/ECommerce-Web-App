@@ -18,4 +18,5 @@ public class ProfileResponseDTO {
     String address;
     List<String> roles = new ArrayList<>();
 
+    int totalOrders;
 }

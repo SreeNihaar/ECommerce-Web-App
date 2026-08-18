@@ -6,9 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,7 +18,7 @@ public class Merchant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int merchantId;
+    private int id;
 
     private String legalBusinessName;
 
@@ -36,6 +34,7 @@ public class Merchant {
     private Set<Product> products = new HashSet<>();
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
     private User user;
 
     @CreationTimestamp
@@ -52,5 +51,4 @@ public class Merchant {
         prod.setMerchant(this);
         products.add(prod);
     }
-
 }

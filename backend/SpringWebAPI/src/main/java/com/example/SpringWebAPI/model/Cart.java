@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,7 +19,7 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "cart_seq")
     @SequenceGenerator(name = "cart_seq", sequenceName = "cart_seq", allocationSize = 1,initialValue = 101)
-    private int cartId;
+    private int id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
@@ -41,7 +39,7 @@ public class Cart {
     public void addProduct(Product product,int quantity){
 
         CartProduct existingItem = items.stream()
-                .filter(item -> item.getProduct().getProductId().equals(product.getProductId()))
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
                 .findFirst()
                 .orElse(null);
 

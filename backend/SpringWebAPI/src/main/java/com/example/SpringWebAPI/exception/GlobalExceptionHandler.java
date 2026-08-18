@@ -1,16 +1,13 @@
 package com.example.SpringWebAPI.exception;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.SpringWebAPI.response.ErrorResponse;
-
-import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,6 +48,13 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(ex.getMessage())
+        );
+    }
+
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public  ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UsernameAlreadyExistsException exp){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
@@ -70,11 +74,84 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(ReviewAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleReviewAlreadyExistsException(ReviewAlreadyExistsException exp){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MerchantProfileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMerchantProfileNotFoundException(MerchantProfileNotFoundException exp){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(MerchantNotAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleMerchantNotAuthorizedException(MerchantNotAuthorizedException exp){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidMerchantException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidMerchantException(InvalidMerchantException exp){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotFoundException(ReviewNotFoundException exp){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> hanndleUnAuthorizedException(UnAuthorizedException exp){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidReviewRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidReviewRequestException(InvalidReviewRequestException exp){
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
+    @ExceptionHandler(InvalidProductRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidProductRequestException(InvalidProductRequestException exp){
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(
+                new ErrorResponse(
+                        exp.getMessage()
+                )
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleInternalError(Exception exp){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new ErrorResponse(
-                        exp.getMessage()
+                        "An internal server error occurred. Please contact support."
                 )
         );
     }
