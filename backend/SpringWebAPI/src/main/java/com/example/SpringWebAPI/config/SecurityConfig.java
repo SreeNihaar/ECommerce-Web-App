@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").hasRole("CONSUMER")
                         .requestMatchers("/api/merchant/**").hasRole("MERCHANT")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/hello").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/review/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.accessDeniedHandler(accessDeniedHandler()))
