@@ -69,7 +69,6 @@ class ProductService{
         try {
             const response = await axios.post(`${config.VITE_BACKEND_API}/products/newProduct`,data, {
                 headers: {
-                "Content-Type": 'multipart/form-data',
                 Authorization: `Bearer ${AuthenticationService.getToken()}`,
                 }
             });
