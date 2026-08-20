@@ -94,7 +94,7 @@ function NewProduct() {
             const response = await ProductService.addProduct(form);
 
             setSuccess(
-                `Product added successfully with ID: ${response.data.result}`
+                response.message
             );
 
             setFormData({
