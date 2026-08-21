@@ -26,13 +26,16 @@ public class Product {
     private String category;
     private Double price;
     private Integer stock;
+    
+    @Column(nullable = false)
     @ColumnDefault("0.0")
-    private Double rating;
+    private Double rating = 0.0;
+    
+    @Column(nullable = false)
     @ColumnDefault("0")
-    private Integer reviewCount;
+    private Integer reviewCount = 0;
 
     //Image
-    // private String image_s3_url; // Need to replace it after creating the S3
     private String imageKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
