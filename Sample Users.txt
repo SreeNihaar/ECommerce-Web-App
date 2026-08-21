@@ -1,0 +1,16 @@
+CONSUMER:
+1)   - username: daredevil178
+     - password: daredevil@9876
+
+2)   - username: jamesbond116
+     - password: america@1922
+
+MERCHANT:
+
+1)   - username: johnseller846
+     - password: John592@Sell
+
+ADMIN:
+
+1)   - username: admin4312
+     - password: adminSample@312
