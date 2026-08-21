@@ -23,7 +23,7 @@ public class OrderProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private OrderStatus productStatus;
+    private OrderStatus productStatus = OrderStatus.PROCESSING;
 
     private double priceAtPurchase;
 
